@@ -4,18 +4,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lowagie.text.DocumentException;
 
 import br.com.MuralFatecApi.DTO.Status;
+import br.com.MuralFatecApi.DTO.Usuario;
 import br.com.MuralFatecApi.service.ServiceMural;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -50,5 +58,23 @@ public class ControllerMural {
 		String sql = "SELECT * FROM muraldb.dbo.TB_TP_STATUS";
 		List<Status> status = jdbcTemplate.query(sql,BeanPropertyRowMapper.newInstance(Status.class));
 		status.forEach(System.out :: println);
+	}
+	
+	@ResponseBody
+	@PostMapping("/realiza-login")
+	public ResponseEntity<Usuario> realizaLogin(@RequestBody String json){
+		Map<String, String> mapJson = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>() {}.getType());
+		System.out.println("nm_email: "+mapJson.get("nm_email")+" nm_senha: "+mapJson.get("nm_senha"));
+		Usuario usuario = serviceMural.realizaLogin(mapJson.get("nm_email"), mapJson.get("nm_senha"));
+		return new ResponseEntity<Usuario>(usuario,HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@PostMapping("/teste")
+	public ResponseEntity<String> teste(@RequestBody String json){
+		Map<String, String> mapJson = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>() {}.getType());
+		System.out.println("nm_email: "+mapJson.get("nm_email")+" nm_senha: "+mapJson.get("nm_senha"));
+		serviceMural.teste(mapJson.get("nm_email"), mapJson.get("nm_senha"));
+		return ResponseEntity.ok("Teste");
 	}
 }

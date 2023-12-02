@@ -4,6 +4,6 @@ import lombok.Data;
 @Data
 public class Status {
 	
-	private int ID_TP_STATUS;
+	private Integer ID_TP_STATUS;
 	private String  NM_TP_STATUS;
 }

@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class Grupo {
 	
-	private int ID_GRUPO;
+	private Integer ID_GRUPO;
 	private String NM_TEMA;
-	private int ID_ORIENTADOR;
+	private Integer ID_ORIENTADOR;
 	private Curso curso;
 	private Periodo periodo;
 	private Status status;
