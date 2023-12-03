@@ -1,4 +1,5 @@
 package br.com.MuralFatecApi.DTO;
+
 import lombok.Data;
 
 @Data

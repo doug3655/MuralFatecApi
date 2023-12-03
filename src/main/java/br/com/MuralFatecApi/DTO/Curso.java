@@ -4,6 +4,6 @@ import lombok.Data;
 @Data
 public class Curso {
 	
-	private Integer ID_TP_CURSO;
-	private String NM_CURSO;
+	private Integer id_tp_curso;
+	private String nm_curso;
 }

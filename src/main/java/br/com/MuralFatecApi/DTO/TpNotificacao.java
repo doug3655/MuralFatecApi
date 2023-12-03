@@ -4,6 +4,6 @@ import lombok.Data;
 @Data
 public class TpNotificacao {
 	
-	private Integer ID_TP_NOTIFICACAO;
-	private String NM_NOTIFICACAO;
+	private Integer id_tp_notificacao;
+	private String nm_notificacao;
 }

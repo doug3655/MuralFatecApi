@@ -4,6 +4,6 @@ import lombok.Data;
 @Data
 public class Periodo {
 	
-	private int ID_TP_PERIODO;
-	private String NM_PERIODO;
+	private int id_tp_periodo;
+	private String nm_periodo;
 }

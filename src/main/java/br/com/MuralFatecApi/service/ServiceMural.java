@@ -62,11 +62,43 @@ public class ServiceMural {
         return file;
 	}
 	
-	public Usuario realizaLogin(String email,String senha) {
-		String sql = "SELECT TOP 1 tu.ID_USUARIO,tu.NM_USUARIO,tu.NR_RA,tu.NM_TELEFONE,tu.NM_EMAIL,tu.ID_TP_PERFIL_USUARIO FROM muraldb.dbo.TB_USUARIO tu WHERE tu.NM_EMAIL = ? AND tu.NM_SENHA = ? AND tu.ID_TP_STATUS = 1 ORDER BY tu.ID_USUARIO DESC";
-		Usuario result = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<Usuario>(Usuario.class),email,senha);
-		System.out.println(new Gson().toJson(result));
+	public Usuario realizaLogin(String email,String senha) throws Exception{
+		Usuario result = new Usuario();
+		try {
+			String sql = "SELECT TOP 1 tu.ID_USUARIO,tu.NM_USUARIO,tu.NR_RA,tu.NM_TELEFONE,tu.NM_EMAIL,tu.ID_TP_PERFIL_USUARIO FROM muraldb.dbo.TB_USUARIO tu WHERE tu.NM_EMAIL = ? AND tu.NM_SENHA = ? AND tu.ID_TP_STATUS = 1 ORDER BY tu.ID_USUARIO DESC";
+			result = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<Usuario>(Usuario.class),email,senha);
+		}catch(Exception e) {
+			System.out.println("Erro na execução da query do realizaLogin:"+e.getMessage());
+		}
 		return result;
+	}
+	
+	public boolean alterarDadosUsuario(Usuario usuario,Integer tipo) throws Exception {
+		return tipo==1?alterarSenha(usuario):alterarTodosDadosUsuario(usuario);
+	}
+	
+	public boolean alterarSenha(Usuario usuario) throws Exception{
+		boolean returno = true;
+		try {
+			String sql = "UPDATE muraldb.dbo.TB_USUARIO SET NM_SENHA=? WHERE ID_USUARIO=?";
+			jdbcTemplate.update(sql, usuario.getNm_senha(),usuario.getId_usuario());
+		}catch(Exception e) {
+			System.out.println("Erro na execução da query do alterarSenha:"+e.getMessage());
+			returno = false;
+		}
+		return returno;
+	}
+	
+	public boolean alterarTodosDadosUsuario(Usuario usuario) throws Exception{
+		boolean returno = true;
+		try {
+			String sql = "UPDATE muraldb.dbo.TB_USUARIO	SET NM_USUARIO=?,NR_RA=?,NM_EMAIL=?,NM_TELEFONE=?,NM_SENHA=? WHERE ID_USUARIO=?";
+			jdbcTemplate.update(sql,usuario.getNm_usuario(),usuario.getNr_ra(),usuario.getNm_email(),usuario.getNm_telefone(),usuario.getNm_senha(),usuario.getId_usuario());
+		}catch(Exception e) {
+			System.out.println("Erro na execução da query do alterarTodosDadosUsuario:"+e.getMessage());
+			returno = false;
+		}
+		return returno;
 	}
 	
 

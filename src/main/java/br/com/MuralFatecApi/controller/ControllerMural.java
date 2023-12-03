@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -64,16 +65,33 @@ public class ControllerMural {
 	@PostMapping("/realiza-login")
 	public ResponseEntity<Usuario> realizaLogin(@RequestBody String json){
 		Map<String, String> mapJson = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>() {}.getType());
-		System.out.println("nm_email: "+mapJson.get("nm_email")+" nm_senha: "+mapJson.get("nm_senha"));
-		Usuario usuario = serviceMural.realizaLogin(mapJson.get("nm_email"), mapJson.get("nm_senha"));
+		Usuario usuario = new Usuario();
+		try {
+			usuario = serviceMural.realizaLogin(mapJson.get("nm_email"), mapJson.get("nm_senha"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return new ResponseEntity<Usuario>(usuario,HttpStatus.OK);
 	}
+	
+	@ResponseBody
+	@PostMapping("/alterar-usuario/{tipo}")
+	public ResponseEntity<String> realizarLogin(@RequestBody Usuario usuario,@PathVariable Integer tipo){
+		boolean retorno = true;
+		try {
+			retorno = serviceMural.alterarDadosUsuario(usuario, tipo);
+		} catch (Exception e) {
+			retorno = false;
+			e.printStackTrace();
+		}
+		return retorno ? ResponseEntity.ok("Dados alterado com sucesso!") : ResponseEntity.internalServerError().body("Erro ao alterar dados");
+	}
+	
 	
 	@ResponseBody
 	@PostMapping("/teste")
 	public ResponseEntity<String> teste(@RequestBody String json){
 		Map<String, String> mapJson = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>() {}.getType());
-		System.out.println("nm_email: "+mapJson.get("nm_email")+" nm_senha: "+mapJson.get("nm_senha"));
 		serviceMural.teste(mapJson.get("nm_email"), mapJson.get("nm_senha"));
 		return ResponseEntity.ok("Teste");
 	}
