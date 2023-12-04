@@ -18,7 +18,7 @@ public class ServiceCadastro {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-	private final String sqlInsertVariosAlunos = "INSERT INTO muraldb.dbo.TB_GRUPO_COMPONENTE (ID_GRUPO,ID_USUARIO) VALUES(?,?)";
+	private final String sqlInsertVariosAlunos = "INSERT INTO muraldb.dbo.TB_GRUPO_COMPONENTE (ID_GRUPO,ID_USUARIO,ID_TP_STATUS) VALUES(?,?,?)";
 
 	public boolean registraUsuario(Usuario usuario) throws Exception{
 		int status = 0;
@@ -38,7 +38,7 @@ public class ServiceCadastro {
 			Map<String, Object> parameters = gerarParametersInsertGrupo(grupo);
 			Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
 			Aluno aluno = grupo.getAlunos().get(0);
-			status = jdbcTemplate.update(sqlInsertVariosAlunos,id.intValue(),aluno.getId_usuario());
+			status = jdbcTemplate.update(sqlInsertVariosAlunos,id.intValue(),aluno.getId_usuario(),5);
 			//grupo.getAlunos().forEach((item) ->jdbcTemplate.update(sqlInsertVariosAlunos,id.intValue(),item.getId_usuario())); -> insert all data of array list
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -55,7 +55,6 @@ public class ServiceCadastro {
 		parameters.put("ID_TP_CURSO",grupo.getId_tp_curso());
 		parameters.put("ID_TP_PERIODO",grupo.getId_tp_periodo());
 		parameters.put("ID_TP_STATUS",3);
-		parameters.put("ID_TP_STATUS_VINCULO",3);
 		parameters.put("FL_TG1",grupo.getFl_tg1());
 		parameters.put("FL_TG2",grupo.getFl_tg2());
 		return parameters;
