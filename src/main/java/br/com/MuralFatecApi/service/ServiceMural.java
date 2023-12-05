@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 import com.lowagie.text.DocumentException;
 
 import br.com.MuralFatecApi.DTO.AlunoVinculo;
+import br.com.MuralFatecApi.DTO.Grupo;
+import br.com.MuralFatecApi.DTO.Notificacao;
 import br.com.MuralFatecApi.DTO.Usuario;
 
 @Service
@@ -77,7 +79,7 @@ public class ServiceMural {
 		return tipo==1?alterarSenha(usuario):alterarTodosDadosUsuario(usuario);
 	}
 	
-	public boolean alterarSenha(Usuario usuario) throws Exception{
+	private boolean alterarSenha(Usuario usuario) throws Exception{
 		boolean returno = true;
 		try {
 			String sql = "UPDATE muraldb.dbo.TB_USUARIO SET NM_SENHA=? WHERE ID_USUARIO=?";
@@ -89,18 +91,80 @@ public class ServiceMural {
 		return returno;
 	}
 	
-	public boolean alterarTodosDadosUsuario(Usuario usuario) throws Exception{
-		boolean returno = true;
+	private boolean alterarTodosDadosUsuario(Usuario usuario) throws Exception{
+		boolean retorno = true;
 		try {
 			String sql = "UPDATE muraldb.dbo.TB_USUARIO	SET NM_USUARIO=?,NR_RA=?,NM_EMAIL=?,NM_TELEFONE=?,NM_SENHA=? WHERE ID_USUARIO=?";
 			jdbcTemplate.update(sql,usuario.getNm_usuario(),usuario.getNr_ra(),usuario.getNm_email(),usuario.getNm_telefone(),usuario.getNm_senha(),usuario.getId_usuario());
 		}catch(Exception e) {
 			System.out.println("Erro na execução da query do alterarTodosDadosUsuario:"+e.getMessage());
-			returno = false;
+			retorno = false;
 		}
-		return returno;
+		return retorno;
 	}
 	
+	public boolean alterarTodosDadosGrupo(Grupo grupo) throws Exception{
+		boolean retorno = true;
+		try {
+			String sql = "UPDATE muraldb.dbo.TB_GRUPO SET NM_TEMA=?,ID_ORIENTADOR=?,ID_TP_CURSO=?,ID_TP_PERIODO=?,FL_TG1=?,FL_TG2=? WHERE ID_GRUPO=?";
+			jdbcTemplate.update(sql,grupo.getNm_tema(),grupo.getId_orientador(),grupo.getId_tp_curso(),grupo.getId_tp_periodo(),grupo.getFl_tg1(),grupo.getFl_tg2(),grupo.getId_grupo());
+		}catch(Exception e) {
+			System.out.println("Erro na execução da query do alterarTodosDadosGrupo:"+e.getMessage());
+			retorno = false;
+		}
+		return retorno;
+	}
+	
+	public boolean alunoSairGrupo(Integer idAluno,Integer idGrupo) throws Exception{
+		boolean retorno = true;
+		try {
+			String sql = "UPDATE muraldb.dbo.TB_GRUPO_COMPONENTE SET ID_TP_STATUS=4	WHERE ID_USUARIO=? AND ID_GRUPO=?";
+			jdbcTemplate.update(sql,idAluno,idGrupo);
+			String sqlDadosGrupo = "SELECT count(tgc.ID_USUARIO) FROM muraldb.dbo.TB_GRUPO_COMPONENTE tgc WHERE tgc.ID_TP_STATUS = 5 AND tgc.ID_GRUPO = ?";
+			Integer alunos =  jdbcTemplate.queryForObject(sqlDadosGrupo,Integer.class, idGrupo);
+			if(alunos==0){
+				String sqlEncerrarGrupo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS=4 WHERE ID_GRUPO=?";
+				jdbcTemplate.update(sqlEncerrarGrupo,idGrupo);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Erro na execução da query do alterarTodosDadosGrupo:"+e.getMessage());
+			retorno = false;
+		}
+		return retorno;
+	}
+	
+	public boolean resolverNotificacao(Notificacao notificacao,Integer tpPerfil) {
+		boolean retorno = true;
+		try {
+			String sql = "UPDATE muraldb.dbo.TB_NOTIFICACAO SET ID_TP_STATUS=? WHERE ID_TP_NOTIFICACAO=?";
+			switch(notificacao.getId_tp_notificacao()) {
+				case 1:
+					jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
+					String sqlUsuario = "UPDATE muraldb.dbo.TB_USUARIO SET ID_TP_STATUS=?,ID_TP_PERFIL_USUARIO=? WHERE ID_USUARIO=?";
+					jdbcTemplate.update(sqlUsuario,notificacao.getId_tp_status(),tpPerfil,notificacao.getNr_entidade_alvo());
+					break;
+				case 2:
+					jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
+					String sqlGrupo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS=? WHERE ID_GRUPO=?";
+					jdbcTemplate.update(sqlGrupo,notificacao.getId_tp_status(),notificacao.getNr_entidade_alvo());
+					break;
+				case 3:
+					jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
+					String sqlVinculo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS_VINCULO=? WHERE ID_GRUPO=?";
+					jdbcTemplate.update(sqlVinculo,notificacao.getId_tp_status(),notificacao.getNr_entidade_alvo());
+					break;
+				default:
+					System.out.println("Tipo de notificação não reconhecido");
+					retorno = false;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Erro na execução da query do resolverNotificacao:"+e.getMessage());
+			retorno = false;
+		}
+		return retorno;
+	}
 
 	public void teste(String email,String senha) {
 		//Varias linhas

@@ -23,8 +23,11 @@ public class ServiceCadastro {
 	public boolean registraUsuario(Usuario usuario) throws Exception{
 		int status = 0;
 		try {
-			String sql = "INSERT INTO muraldb.dbo.TB_USUARIO (NM_USUARIO,NR_RA,NM_EMAIL,NM_TELEFONE,NM_SENHA,ID_TP_STATUS) VALUES (?,?,?,?,?,?)";
-			status = jdbcTemplate.update(sql,usuario.getNm_usuario(),usuario.getNr_ra(),usuario.getNm_email(),usuario.getNm_telefone(),usuario.getNm_senha(),3);
+			SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("TB_USUARIO").usingGeneratedKeyColumns("ID_USUARIO");
+			Map<String, Object> parameters = gerarParametersInsertUsuario(usuario);
+			Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
+			String sqlRegistraNotigicacao = "INSERT INTO muraldb.dbo.TB_NOTIFICACAO (ID_TP_NOTIFICACAO,ID_TP_STATUS,NR_ENTIDADE_ALVO) VALUES (1,3,?)";
+			status = jdbcTemplate.update(sqlRegistraNotigicacao,id.intValue());
 		}catch(Exception e) {
 			System.out.println("Erro na execução da query do registraUsuario:"+e.getMessage());
 		}
@@ -54,9 +57,21 @@ public class ServiceCadastro {
 		parameters.put("ID_ORIENTADOR",grupo.getId_orientador());
 		parameters.put("ID_TP_CURSO",grupo.getId_tp_curso());
 		parameters.put("ID_TP_PERIODO",grupo.getId_tp_periodo());
-		parameters.put("ID_TP_STATUS",3);
+		parameters.put("ID_TP_STATUS_VINCULO",grupo.getId_tp_status_vinculo());
+		parameters.put("ID_TP_STATUS",grupo.getId_tp_status());
 		parameters.put("FL_TG1",grupo.getFl_tg1());
 		parameters.put("FL_TG2",grupo.getFl_tg2());
+		return parameters;
+	}
+	
+	private Map<String, Object> gerarParametersInsertUsuario(Usuario usuario){
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("NM_USUARIO",usuario.getNm_usuario());
+		parameters.put("NR_RA",usuario.getNr_ra());
+		parameters.put("NM_EMAIL",usuario.getNm_email());
+		parameters.put("NM_TELEFONE",usuario.getNm_telefone());
+		parameters.put("NM_SENHA",usuario.getNm_senha());
+		parameters.put("ID_TP_STATUS",3);
 		return parameters;
 	}
 }

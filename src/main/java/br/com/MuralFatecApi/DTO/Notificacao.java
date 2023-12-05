@@ -8,4 +8,5 @@ public class Notificacao {
 	private Integer id_tp_notificacao;
 	private Integer id_tp_status;
 	private Integer nr_entidade_alvo;
+	private String nm_notificacao;
 }

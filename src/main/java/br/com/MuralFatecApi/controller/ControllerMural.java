@@ -23,6 +23,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lowagie.text.DocumentException;
 
+import br.com.MuralFatecApi.DTO.Grupo;
+import br.com.MuralFatecApi.DTO.Notificacao;
 import br.com.MuralFatecApi.DTO.Status;
 import br.com.MuralFatecApi.DTO.Usuario;
 import br.com.MuralFatecApi.service.ServiceMural;
@@ -85,6 +87,45 @@ public class ControllerMural {
 			e.printStackTrace();
 		}
 		return retorno ? ResponseEntity.ok("Dados alterado com sucesso!") : ResponseEntity.internalServerError().body("Erro ao alterar dados");
+	}
+	
+	@ResponseBody
+	@PostMapping("/alterar-grupo")
+	public ResponseEntity<String> alteraGrupo(@RequestBody Grupo grupo){
+		boolean retorno = true;
+		try {
+			retorno = serviceMural.alterarTodosDadosGrupo(grupo);
+		} catch (Exception e) {
+			retorno = false;
+			e.printStackTrace();
+		}
+		return retorno ? ResponseEntity.ok("Dados alterado com sucesso!") : ResponseEntity.internalServerError().body("Erro ao alterar dados");
+	}
+	
+	@ResponseBody
+	@PostMapping("/aluno-sair-grupo/{idAluno}/{idGrupo}")
+	public ResponseEntity<String> alunoSairGrupo(@PathVariable Integer idAluno,@PathVariable Integer idGrupo){
+		boolean retorno = true;
+		try {
+			retorno = serviceMural.alunoSairGrupo(idAluno,idGrupo);
+		} catch (Exception e) {
+			retorno = false;
+			e.printStackTrace();
+		}
+		return retorno ? ResponseEntity.ok("Aluno saiu do grupo com sucesso") : ResponseEntity.internalServerError().body("Erro ao sair do grupo");
+	}
+	
+	@ResponseBody
+	@PostMapping("/resolver-notificacao/{tpPerfil}")
+	public ResponseEntity<String> alteraGrupo(@RequestBody Notificacao notificacao,@PathVariable Integer tpPerfil){
+		boolean retorno = true;
+		try {
+			retorno = serviceMural.resolverNotificacao(notificacao,tpPerfil);
+		} catch (Exception e) {
+			retorno = false;
+			e.printStackTrace();
+		}
+		return retorno ? ResponseEntity.ok("Notificacao resolvida com sucesso!") : ResponseEntity.internalServerError().body("Erro ao resolver notificacao");
 	}
 	
 	
