@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import com.google.gson.Gson;
 import com.lowagie.text.DocumentException;
 
-import br.com.MuralFatecApi.DTO.AlunoVinculo;
+import br.com.MuralFatecApi.DTO.DadosPDFVinculo;
 import br.com.MuralFatecApi.DTO.Grupo;
 import br.com.MuralFatecApi.DTO.Notificacao;
 import br.com.MuralFatecApi.DTO.Usuario;
@@ -33,17 +35,19 @@ public class ServiceMural {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-	public File criaPdfVinculoTg() throws IOException, DocumentException {
+	@Autowired
+	private ServiceBusca serviceBusca;
+	
+	public File criaPdfVinculoTg(Integer idGrupo, Boolean isPrimeiroVinculo) throws IOException, DocumentException {
 		Context context = new Context();
         String html = "";
-        List<AlunoVinculo> alunosVinculo = new ArrayList<AlunoVinculo>();
-        AlunoVinculo alunoVinculo1 = new AlunoVinculo("teste1");
-        AlunoVinculo alunoVinculo2 = new AlunoVinculo("teste2");
-        AlunoVinculo alunoVinculo3 = new AlunoVinculo("teste3");
-        alunosVinculo.add(alunoVinculo1);
-        alunosVinculo.add(alunoVinculo2);
-        alunosVinculo.add(alunoVinculo3);
-        context.setVariable("alunos", alunosVinculo);
+        DadosPDFVinculo dados = serviceBusca.buscaDadosGrupoPDF(idGrupo);
+        LocalDate hoje = LocalDate.now(ZoneId.of("GMT-3")) ;
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/uuuu") ;
+        String dataHoje = hoje.format(formato) ;
+        context.setVariable("dados", dados);
+        context.setVariable("isPrimeiroVinculo", isPrimeiroVinculo);
+        context.setVariable("dataHoje", dataHoje);
         html = loadAndFillTemplate("VinculoTG",context);
         return renderPdfVinculoTg(html);
 	}
@@ -137,20 +141,18 @@ public class ServiceMural {
 	public boolean resolverNotificacao(Notificacao notificacao,Integer tpPerfil) {
 		boolean retorno = true;
 		try {
-			String sql = "UPDATE muraldb.dbo.TB_NOTIFICACAO SET ID_TP_STATUS=? WHERE ID_TP_NOTIFICACAO=?";
+			String sql = "UPDATE muraldb.dbo.TB_NOTIFICACAO SET ID_TP_STATUS=? WHERE ID_NOTIFICACAO=?";
+			jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
 			switch(notificacao.getId_tp_notificacao()) {
 				case 1:
-					jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
 					String sqlUsuario = "UPDATE muraldb.dbo.TB_USUARIO SET ID_TP_STATUS=?,ID_TP_PERFIL_USUARIO=? WHERE ID_USUARIO=?";
 					jdbcTemplate.update(sqlUsuario,notificacao.getId_tp_status(),tpPerfil,notificacao.getNr_entidade_alvo());
 					break;
 				case 2:
-					jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
 					String sqlGrupo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS=? WHERE ID_GRUPO=?";
 					jdbcTemplate.update(sqlGrupo,notificacao.getId_tp_status(),notificacao.getNr_entidade_alvo());
 					break;
 				case 3:
-					jdbcTemplate.update(sql,notificacao.getId_tp_status(),notificacao.getId_notificacao());
 					String sqlVinculo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS_VINCULO=? WHERE ID_GRUPO=?";
 					jdbcTemplate.update(sqlVinculo,notificacao.getId_tp_status(),notificacao.getNr_entidade_alvo());
 					break;

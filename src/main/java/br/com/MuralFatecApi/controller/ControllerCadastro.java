@@ -34,7 +34,7 @@ public class ControllerCadastro {
 	
 	@ResponseBody
 	@PostMapping("/registrar-grupo")
-	public ResponseEntity<String> registrarUsuario(@RequestBody String grupo){
+	public ResponseEntity<String> registrarGrupo(@RequestBody String grupo){
 		Grupo dadosGrupo = new Gson().fromJson(grupo, Grupo.class);
 		boolean retorno = true;;
 		try {

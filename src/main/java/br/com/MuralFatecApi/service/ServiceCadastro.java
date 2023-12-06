@@ -19,6 +19,8 @@ public class ServiceCadastro {
 	private JdbcTemplate jdbcTemplate;
 	
 	private final String sqlInsertVariosAlunos = "INSERT INTO muraldb.dbo.TB_GRUPO_COMPONENTE (ID_GRUPO,ID_USUARIO,ID_TP_STATUS) VALUES(?,?,?)";
+	
+	private final String sqlRegistraNotigicacao = "INSERT INTO muraldb.dbo.TB_NOTIFICACAO (ID_TP_NOTIFICACAO,ID_TP_STATUS,NR_ENTIDADE_ALVO) VALUES (?,3,?)";
 
 	public boolean registraUsuario(Usuario usuario) throws Exception{
 		int status = 0;
@@ -26,8 +28,7 @@ public class ServiceCadastro {
 			SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("TB_USUARIO").usingGeneratedKeyColumns("ID_USUARIO");
 			Map<String, Object> parameters = gerarParametersInsertUsuario(usuario);
 			Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
-			String sqlRegistraNotigicacao = "INSERT INTO muraldb.dbo.TB_NOTIFICACAO (ID_TP_NOTIFICACAO,ID_TP_STATUS,NR_ENTIDADE_ALVO) VALUES (1,3,?)";
-			status = jdbcTemplate.update(sqlRegistraNotigicacao,id.intValue());
+			status = jdbcTemplate.update(sqlRegistraNotigicacao,1,id.intValue());
 		}catch(Exception e) {
 			System.out.println("Erro na execução da query do registraUsuario:"+e.getMessage());
 		}
@@ -42,6 +43,7 @@ public class ServiceCadastro {
 			Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
 			Aluno aluno = grupo.getAlunos().get(0);
 			status = jdbcTemplate.update(sqlInsertVariosAlunos,id.intValue(),aluno.getId_usuario(),5);
+			status = jdbcTemplate.update(sqlRegistraNotigicacao,2,id.intValue());
 			//grupo.getAlunos().forEach((item) ->jdbcTemplate.update(sqlInsertVariosAlunos,id.intValue(),item.getId_usuario())); -> insert all data of array list
 		}catch(Exception e) {
 			e.printStackTrace();

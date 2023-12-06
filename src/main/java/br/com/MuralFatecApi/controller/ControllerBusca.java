@@ -16,6 +16,7 @@ import br.com.MuralFatecApi.DTO.Grupo;
 import br.com.MuralFatecApi.DTO.Notificacao;
 import br.com.MuralFatecApi.DTO.Orientador;
 import br.com.MuralFatecApi.DTO.Periodo;
+import br.com.MuralFatecApi.DTO.Usuario;
 import br.com.MuralFatecApi.service.ServiceBusca;
 
 @Controller
@@ -61,15 +62,75 @@ public class ControllerBusca {
 	}
 	
 	@ResponseBody
-	@GetMapping("/busca-dado-grupo/{idUsuario}")
-	public ResponseEntity<Grupo> buscaDadosGrupo(@PathVariable Integer idUsuario){
+	@GetMapping("/busca-dado-grupo-aluno/{idUsuario}")
+	public ResponseEntity<Grupo> buscaDadosGrupoAluno(@PathVariable Integer idUsuario){
 		Grupo grupo = new Grupo();
 		try {
-			grupo = serviceBusca.buscaDadosGrupo(idUsuario);
+			grupo = serviceBusca.buscaDadosGrupoAluno(idUsuario);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<Grupo>(grupo,HttpStatus.OK);
+		return grupo.getId_grupo() != null ? new ResponseEntity<Grupo>(grupo,HttpStatus.OK) : new ResponseEntity<Grupo>(grupo,HttpStatus.NOT_FOUND);
+	}
+	
+	@ResponseBody
+	@GetMapping("/busca-dado-grupo-por-nome/{tpPerfil}/{idOrientador}/{nomeGrupo}")
+	public ResponseEntity<List<Grupo>> buscaDadosGrupoPorNome(@PathVariable Integer tpPerfil,@PathVariable Integer idOrientador,@PathVariable String nomeGrupo){
+		List<Grupo> grupos = new ArrayList<Grupo>();
+		try {
+			grupos = serviceBusca.buscaDadosGrupoPorNome(tpPerfil,idOrientador,nomeGrupo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return !grupos.isEmpty() ? new ResponseEntity<List<Grupo>>(grupos,HttpStatus.OK) : new ResponseEntity<List<Grupo>>(grupos,HttpStatus.NOT_FOUND);
+	}
+	
+	@ResponseBody
+	@GetMapping("/busca-usuario-nome/{nomeUsuario}")
+	public ResponseEntity<List<Usuario>> buscaUsuarioPorNome(@PathVariable String nomeUsuario){
+		List<Usuario> usuarios = new ArrayList<Usuario>();
+		try {
+			usuarios = serviceBusca.buscaUsuarioPorNome(nomeUsuario);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return !usuarios.isEmpty() ? new ResponseEntity<List<Usuario>>(usuarios,HttpStatus.OK) : new ResponseEntity<List<Usuario>>(usuarios,HttpStatus.NOT_FOUND);
+	}
+	
+	@ResponseBody
+	@GetMapping("/busca-aluno-nome/{nomeUsuario}")
+	public ResponseEntity<List<Usuario>> buscaAlunoPorNome(@PathVariable String nomeUsuario){
+		List<Usuario> usuarios = new ArrayList<Usuario>();
+		try {
+			usuarios = serviceBusca.buscaAlunoPorNome(nomeUsuario);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return !usuarios.isEmpty() ? new ResponseEntity<List<Usuario>>(usuarios,HttpStatus.OK) : new ResponseEntity<List<Usuario>>(usuarios,HttpStatus.NOT_FOUND);
+	}
+	
+	@ResponseBody
+	@GetMapping("/busca-dado-grupo-id/{idGrupo}")
+	public ResponseEntity<Grupo> buscaDadosGrupoPorId(@PathVariable Integer idGrupo){
+		Grupo grupo = new Grupo();
+		try {
+			grupo = serviceBusca.buscaDadosGrupoPorId(idGrupo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return grupo.getId_grupo() != null ? new ResponseEntity<Grupo>(grupo,HttpStatus.OK) : new ResponseEntity<Grupo>(grupo,HttpStatus.NOT_FOUND);
+	}
+	
+	@ResponseBody
+	@GetMapping("/busca-dado-usuario-id/{idUsuario}")
+	public ResponseEntity<Usuario> buscaDadosUsuarioPorId(@PathVariable Integer idUsuario){
+		Usuario usuario = new Usuario();
+		try {
+			usuario = serviceBusca.buscaDadosUsuarioPorId(idUsuario);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return usuario.getId_usuario() != null ? new ResponseEntity<Usuario>(usuario,HttpStatus.OK) : new ResponseEntity<Usuario>(usuario,HttpStatus.NOT_FOUND);
 	}
 	
 	@ResponseBody

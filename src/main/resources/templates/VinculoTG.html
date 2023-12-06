@@ -24,6 +24,7 @@
             }
     
             .tabelaDados {
+				width: 100%;
                 border-collapse: collapse;
                 text-align: left;
                 vertical-align: top;
@@ -59,39 +60,36 @@
 		<table class="tabelaDados">
 			<tr>
 				<td colspan="2">
-					<a>Orientando(a):Douglas Braga de Lima<br />Hakemi Pereira Alecrim</a>
+					<a th:each="aluno,iterStat : ${dados.grupo.alunos}"><span th:if="${iterStat.index} <1" th:text="${'Orientando(a):'+aluno.nm_usuario}"></span><br th:if="${iterStat.index} >0"/><span th:if="${iterStat.index} >0" th:text="${aluno.nm_usuario}"></span></a>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<a>Número de matrícula:<br />
-						1430481911021<br />
-						1430481921013
-					</a>
+					<a th:each="aluno,iterStat : ${dados.grupo.alunos}"><span th:if="${iterStat.index} <1" th:text="${'Número de matrícula:'+aluno.nr_ra}"></span><br th:if="${iterStat.index} >0"/><span th:if="${iterStat.index} >0" th:text="${aluno.nr_ra}"></span></a>
 				</td>
 				<td>
-					<a>Curso: Análise e Desenvolvimento de Sistema<br />
-						Período: ( X ) matutino ( ) noturno<br />
-						Matriculado em: TG I ( X ) TG II ( X )<br /></a>
+					<a>Curso: <span th:text="${dados.curso}"></span><br />
+						Período: ( <span th:if="${dados.grupo.id_tp_periodo} ==1" th:text="${'X'}"></span> ) matutino ( <span th:if="${dados.grupo.id_tp_periodo} !=1" th:text="${'X'}"></span> ) noturno<br />
+						Matriculado em: TG I ( <span th:if="${dados.grupo.fl_tg1}" th:text="${'X'}"></span> ) TG II ( <span th:if="${dados.grupo.fl_tg2}" th:text="${'X'}"></span> )<br /></a>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
 					<a> Orientador(a):<br />
-						Prof. Me. Jose Luís Barboza Lobianco
+						<span th:text="${dados.orientador}"></span>
 					</a>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
 					<a>Tema/Título do Projeto:<br />
-						Mural - sistema de divulgação sobre trabalhos de graduação: um estudo de caso sobre trabalhos de
-						graduação numa faculdade de tecnologia </a>
+						 <span th:text="${dados.grupo.nm_tema}"></span>
+						 </a>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
-					<pre>( X ) Primeiro Vínculo              (  ) Renovação do Vínculo  </pre>
+					<pre>( <span th:if="${isPrimeiroVinculo}" th:text="${'X'}"></span> ) Primeiro Vínculo              ( <span th:if="!${isPrimeiroVinculo}" th:text="${'X'}"></span> ) Renovação do Vínculo  </pre>
 				</td>
 			</tr>
 		</table>
@@ -112,12 +110,9 @@
 		<div class="assinatura">
 			<table cellspacing="0">
 				<tr>
-					<td class="bordaInferior">Data:01/01/2023</td >
+					<td class="bordaInferior">Data: <span th:text="${dataHoje}"></span></td >
 				</tr>
-				<tr>
-					<td class="bordaInferior">Orientando(a)</td>
-				</tr>
-				<tr>
+				<tr th:each="aluno: ${dados.grupo.alunos}">
 					<td class="bordaInferior">Orientando(a)</td>
 				</tr>
 				<tr>

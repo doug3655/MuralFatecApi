@@ -15,5 +15,5 @@ public class Grupo {
 	private Integer id_tp_status_vinculo;
 	private Boolean fl_tg1;
 	private Boolean fl_tg2;
-	private List<Aluno> Alunos;
+	private List<Aluno> alunos;
 }

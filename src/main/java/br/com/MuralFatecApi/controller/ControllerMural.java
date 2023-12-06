@@ -39,10 +39,10 @@ public class ControllerMural {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
-	@PostMapping("/pdf-vinculo-tg-i-ii")
-	public void downloadPDFResource(HttpServletResponse response){
+	@PostMapping("/pdf-vinculo-tg-i-ii/{idGrupo}/{isPrimeiroVinculo}")
+	public void downloadPDFResource(HttpServletResponse response,@PathVariable Integer idGrupo,@PathVariable Boolean isPrimeiroVinculo){
 	       try {
-	            Path file = Paths.get(serviceMural.criaPdfVinculoTg().getAbsolutePath());
+	            Path file = Paths.get(serviceMural.criaPdfVinculoTg(idGrupo,isPrimeiroVinculo).getAbsolutePath());
 	            if (Files.exists(file)) {
 	                response.setContentType("application/pdf");
 	                response.addHeader("Content-Disposition",
