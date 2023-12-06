@@ -76,4 +76,16 @@ public class ServiceCadastro {
 		parameters.put("ID_TP_STATUS",3);
 		return parameters;
 	}
+
+	public boolean registrarAlunoGrupo(Integer idUsuario, Integer idGrupo) {
+		Integer status = 0;
+		try {
+			status = jdbcTemplate.update(sqlInsertVariosAlunos,idGrupo,idUsuario,5);
+		}catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Erro na execução da query do registrarAlunoGrupo:"+e.getMessage());
+		}
+		
+		return status != 0 ? true : false;
+	}
 }

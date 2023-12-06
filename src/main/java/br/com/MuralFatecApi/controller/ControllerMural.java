@@ -73,7 +73,7 @@ public class ControllerMural {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<Usuario>(usuario,HttpStatus.OK);
+		return new ResponseEntity<Usuario>(usuario,usuario.getId_usuario() != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 	
 	@ResponseBody
@@ -105,14 +105,25 @@ public class ControllerMural {
 	@ResponseBody
 	@PostMapping("/aluno-sair-grupo/{idAluno}/{idGrupo}")
 	public ResponseEntity<String> alunoSairGrupo(@PathVariable Integer idAluno,@PathVariable Integer idGrupo){
-		boolean retorno = true;
+		Integer retorno = 0;
 		try {
 			retorno = serviceMural.alunoSairGrupo(idAluno,idGrupo);
 		} catch (Exception e) {
-			retorno = false;
 			e.printStackTrace();
 		}
-		return retorno ? ResponseEntity.ok("Aluno saiu do grupo com sucesso") : ResponseEntity.internalServerError().body("Erro ao sair do grupo");
+		return retorno>-1 ? ResponseEntity.ok("Aluno saiu do grupo com sucesso") : ResponseEntity.internalServerError().body("Erro ao sair do grupo");
+	}
+	
+	@ResponseBody
+	@PostMapping("/remover-aluno-grupo/{idAluno}/{idGrupo}")
+	public ResponseEntity<Integer> removerAlunoGrupo(@PathVariable Integer idAluno,@PathVariable Integer idGrupo){
+		Integer retorno = 0;
+		try {
+			retorno = serviceMural.alunoSairGrupo(idAluno,idGrupo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retorno>-1 ? ResponseEntity.ok(retorno) : ResponseEntity.internalServerError().body(retorno);
 	}
 	
 	@ResponseBody

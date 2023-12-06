@@ -3,6 +3,7 @@ package br.com.MuralFatecApi.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -44,5 +45,18 @@ public class ControllerCadastro {
 			e.printStackTrace();
 		}
 		return retorno ? ResponseEntity.ok("Grupo registrado!") : ResponseEntity.internalServerError().body("Erro ao registrar grupo");
+	}
+	
+	@ResponseBody
+	@PostMapping("/registrar-aluno-grupo/{idUsuario}/{idGrupo}")
+	public ResponseEntity<String> registrarAlunoGrupo(@PathVariable Integer idUsuario,@PathVariable Integer idGrupo){
+		boolean retorno = true;;
+		try {
+			retorno = serviceCadastro.registrarAlunoGrupo(idUsuario,idGrupo);
+		} catch (Exception e) {
+			retorno = false;
+			e.printStackTrace();
+		}
+		return retorno ? ResponseEntity.ok("Aluno registrado no grupo!") : ResponseEntity.internalServerError().body("Erro ao registrar Aluno no grupo");
 	}
 }

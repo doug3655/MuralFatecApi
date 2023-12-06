@@ -119,23 +119,23 @@ public class ServiceMural {
 		return retorno;
 	}
 	
-	public boolean alunoSairGrupo(Integer idAluno,Integer idGrupo) throws Exception{
-		boolean retorno = true;
+	public Integer alunoSairGrupo(Integer idAluno,Integer idGrupo) throws Exception{
+		Integer alunos = -1;
 		try {
 			String sql = "UPDATE muraldb.dbo.TB_GRUPO_COMPONENTE SET ID_TP_STATUS=4	WHERE ID_USUARIO=? AND ID_GRUPO=?";
 			jdbcTemplate.update(sql,idAluno,idGrupo);
-			String sqlDadosGrupo = "SELECT count(tgc.ID_USUARIO) FROM muraldb.dbo.TB_GRUPO_COMPONENTE tgc WHERE tgc.ID_TP_STATUS = 5 AND tgc.ID_GRUPO = ?";
-			Integer alunos =  jdbcTemplate.queryForObject(sqlDadosGrupo,Integer.class, idGrupo);
+			String sqlDadosGrupo = "SELECT count(tgc.ID_USUARIO) FROM muraldb.dbo.TB_GRUPO_COMPONENTE tgc WHERE tgc.ID_TP_STATUS = 4 AND tgc.ID_GRUPO = ?";
+			alunos =  jdbcTemplate.queryForObject(sqlDadosGrupo,Integer.class, idGrupo);
 			if(alunos==0){
 				String sqlEncerrarGrupo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS=4 WHERE ID_GRUPO=?";
 				jdbcTemplate.update(sqlEncerrarGrupo,idGrupo);
 			}
 		}catch(Exception e) {
+			alunos = -1;
 			e.printStackTrace();
 			System.out.println("Erro na execução da query do alterarTodosDadosGrupo:"+e.getMessage());
-			retorno = false;
 		}
-		return retorno;
+		return alunos;
 	}
 	
 	public boolean resolverNotificacao(Notificacao notificacao,Integer tpPerfil) {
