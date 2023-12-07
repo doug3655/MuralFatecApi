@@ -124,7 +124,7 @@ public class ServiceMural {
 		try {
 			String sql = "UPDATE muraldb.dbo.TB_GRUPO_COMPONENTE SET ID_TP_STATUS=4	WHERE ID_USUARIO=? AND ID_GRUPO=?";
 			jdbcTemplate.update(sql,idAluno,idGrupo);
-			String sqlDadosGrupo = "SELECT count(tgc.ID_USUARIO) FROM muraldb.dbo.TB_GRUPO_COMPONENTE tgc WHERE tgc.ID_TP_STATUS = 4 AND tgc.ID_GRUPO = ?";
+			String sqlDadosGrupo = "SELECT count(tgc.ID_USUARIO) FROM muraldb.dbo.TB_GRUPO_COMPONENTE tgc WHERE tgc.ID_TP_STATUS = 5 AND tgc.ID_GRUPO = ?";
 			alunos =  jdbcTemplate.queryForObject(sqlDadosGrupo,Integer.class, idGrupo);
 			if(alunos==0){
 				String sqlEncerrarGrupo = "UPDATE muraldb.dbo.TB_GRUPO SET ID_TP_STATUS=4 WHERE ID_GRUPO=?";

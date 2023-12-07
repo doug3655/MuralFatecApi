@@ -34,13 +34,13 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ControllerMural {
 	
 	@Autowired
-	ServiceMural serviceMural;
+	private ServiceMural serviceMural;
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
 	@PostMapping("/pdf-vinculo-tg-i-ii/{idGrupo}/{isPrimeiroVinculo}")
-	public void downloadPDFResource(HttpServletResponse response,@PathVariable Integer idGrupo,@PathVariable Boolean isPrimeiroVinculo){
+	public void pdfVinculoTgiII(HttpServletResponse response,@PathVariable Integer idGrupo,@PathVariable Boolean isPrimeiroVinculo){
 	       try {
 	            Path file = Paths.get(serviceMural.criaPdfVinculoTg(idGrupo,isPrimeiroVinculo).getAbsolutePath());
 	            if (Files.exists(file)) {
@@ -78,7 +78,7 @@ public class ControllerMural {
 	
 	@ResponseBody
 	@PostMapping("/alterar-usuario/{tipo}")
-	public ResponseEntity<String> realizarLogin(@RequestBody Usuario usuario,@PathVariable Integer tipo){
+	public ResponseEntity<String> alterarUsuario(@RequestBody Usuario usuario,@PathVariable Integer tipo){
 		boolean retorno = true;
 		try {
 			retorno = serviceMural.alterarDadosUsuario(usuario, tipo);
@@ -128,7 +128,7 @@ public class ControllerMural {
 	
 	@ResponseBody
 	@PostMapping("/resolver-notificacao/{tpPerfil}")
-	public ResponseEntity<String> alteraGrupo(@RequestBody Notificacao notificacao,@PathVariable Integer tpPerfil){
+	public ResponseEntity<String> resolverNotificacao(@RequestBody Notificacao notificacao,@PathVariable Integer tpPerfil){
 		boolean retorno = true;
 		try {
 			retorno = serviceMural.resolverNotificacao(notificacao,tpPerfil);

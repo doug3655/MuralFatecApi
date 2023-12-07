@@ -126,7 +126,7 @@ public class ServiceBusca {
 			String orientador = jdbcTemplate.queryForObject(sqlBuscaOrientador,String.class,grupo.getId_orientador());
 			String verificaExisteNotificacao = "SELECT ISNULL((SELECT ID_NOTIFICACAO FROM muraldb.dbo.TB_NOTIFICACAO WHERE ID_TP_NOTIFICACAO = 3 AND ID_TP_STATUS = 3 AND NR_ENTIDADE_ALVO = ?),0) AS ID_NOTIFICACAO";
 			Integer result = jdbcTemplate.queryForObject(verificaExisteNotificacao,Integer.class,idGrupo);
-			if(result!=null && result>0) {
+			if(result!=null && result==0) {
 				String sqlRegistraNotigicacao = "INSERT INTO muraldb.dbo.TB_NOTIFICACAO (ID_TP_NOTIFICACAO,ID_TP_STATUS,NR_ENTIDADE_ALVO) VALUES (3,3,?)";
 				jdbcTemplate.update(sqlRegistraNotigicacao,idGrupo);
 			}
@@ -187,7 +187,7 @@ public class ServiceBusca {
 	public List<Usuario> buscaAlunoPorNome(String nomeUsuario) {
 		List<Usuario> usuarios = new ArrayList<Usuario>();
 		try {
-			String query = "WITH USUARIOS AS (SELECT tu.ID_USUARIO,tu.NM_USUARIO,tgc.ID_GRUPO_COMPONENTE,tgc.ID_TP_STATUS FROM muraldb.dbo.TB_USUARIO tu LEFT JOIN muraldb.dbo.TB_GRUPO_COMPONENTE tgc ON tu.ID_USUARIO = tgc.ID_USUARIO WHERE tu.ID_TP_STATUS = 1 AND tu.ID_TP_PERFIL_USUARIO = 1 AND tu.NM_USUARIO LIKE ?) SELECT ID_USUARIO,NM_USUARIO FROM USUARIOS WHERE ID_TP_STATUS IS NULL OR ID_TP_STATUS NOT IN (5);";
+			String query = "WITH USUARIOS AS (SELECT tu.ID_USUARIO,tu.NM_USUARIO FROM muraldb.dbo.TB_USUARIO tu  WHERE tu.ID_TP_STATUS = 1 AND tu.ID_TP_PERFIL_USUARIO = 1 AND tu.NM_USUARIO LIKE ?) SELECT DISTINCT us.ID_USUARIO,us.NM_USUARIO FROM USUARIOS us LEFT JOIN muraldb.dbo.TB_GRUPO_COMPONENTE tgc ON us.ID_USUARIO = tgc.ID_USUARIO  WHERE tgc.ID_TP_STATUS IS NULL OR tgc.ID_TP_STATUS NOT IN (5)";
 			usuarios = jdbcTemplate.query(query, new BeanPropertyRowMapper<Usuario>(Usuario.class),"%"+nomeUsuario+"%");
 		}catch(Exception e) {
 			System.out.println("Erro na execução da query do buscaUsuarioPorNome:"+e.getMessage());
